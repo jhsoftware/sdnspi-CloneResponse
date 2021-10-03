@@ -12,8 +12,8 @@
   Public Overrides Function ValidateData() As Boolean
     txtZone.Text = txtZone.Text.Trim.ToLowerInvariant
 
-    Dim d As JHSoftware.SimpleDNS.Plugin.DomainName
-    If Not JHSoftware.SimpleDNS.Plugin.DomainName.TryParse(txtZone.Text, d) OrElse d.SegmentCount < 1 Then
+    Dim d As JHSoftware.SimpleDNS.DomName
+    If Not JHSoftware.SimpleDNS.DomName.TryParse(txtZone.Text, d) OrElse d.SegmentCount < 1 Then
       MessageBox.Show("Invalid clone from zone name", "Clone Zone", MessageBoxButtons.OK, MessageBoxIcon.Error)
       Return False
     End If
@@ -38,7 +38,7 @@
 
   Public Overrides Function SaveData() As String
     Dim cfg As New MyConfig
-    cfg.CloneZone = JHSoftware.SimpleDNS.Plugin.DomainName.Parse(txtZone.Text.Trim)
+    cfg.CloneZone = JHSoftware.SimpleDNS.DomName.Parse(txtZone.Text.Trim)
     'cfg.TLD3String = txt3LD.Text
     cfg.PSLFile = txtFile.Text.Trim
     Return cfg.Save

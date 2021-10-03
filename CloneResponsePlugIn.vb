@@ -1,4 +1,6 @@
-﻿Public Class CloneResponsePlugIn
+﻿Imports System.Threading.Tasks
+
+Public Class CloneResponsePlugIn
   Implements JHSoftware.SimpleDNS.Plugin.ICloneAnswerPlugIn
 
   Private Cfg As MyConfig
@@ -24,8 +26,6 @@
   Public Sub StopService() Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.StopService
   End Sub
 
-  Public Function GetDNSAskAbout() As JHSoftware.SimpleDNS.Plugin.DNSAskAbout Implements JHSoftware.SimpleDNS.Plugin.ICloneAnswerPlugIn.GetDNSAskAbout
-  End Function
 #End Region
 
   Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetPlugInTypeInfo
@@ -33,12 +33,10 @@
     rv.Name = "Clone Response"
     rv.Description = "Clones as response from data for another domain"
     rv.InfoURL = "http://www.simpledns.com/kb.aspx?kbid=1289"
-    rv.MultiThreaded = False
-    rv.ConfigFile = False
     Return rv
   End Function
 
-  Public Sub LoadConfig(ByVal config As String, ByVal instanceID As System.Guid, ByVal dataPath As String, ByRef maxThreads As Integer) Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.LoadConfig
+  Public Sub LoadConfig(ByVal config As String, ByVal instanceID As System.Guid, ByVal dataPath As String) Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.LoadConfig
     Cfg = MyConfig.Load(config)
   End Sub
 
@@ -51,25 +49,16 @@
     RegDoms.Load(Cfg.PSLFile)
   End Sub
 
-  Public Sub Lookup(ByVal request As JHSoftware.SimpleDNS.Plugin.IDNSRequest, ByRef cloneFromZone As JHSoftware.SimpleDNS.Plugin.DomainName, ByRef prefixLabels As Integer, ByRef forceAA As Boolean) Implements JHSoftware.SimpleDNS.Plugin.ICloneAnswerPlugIn.Lookup
+  Public Function Lookup(request As IDNSRequest) As Task(Of ICloneAnswerPlugIn.Result) Implements ICloneAnswerPlugIn.Lookup
+    Return Task.FromResult(Lookup2(request))
+  End Function
+
+  Private Function Lookup2(request As IDNSRequest) As ICloneAnswerPlugIn.Result
     Dim qnlc = request.QName.SegmentCount
-    If qnlc < 2 Then cloneFromZone = Nothing : Exit Sub
-
-    'If Cfg.TLD3.ContainsKey(request.QName.GetSegments(qnlc - 1, 1)) Then
-    '  If qnlc < 3 Then cloneFromZone = Nothing : Exit Sub
-    '  cloneFromZone = Cfg.CloneZone
-    '  prefixLabels = qnlc - 3
-    'Else
-    '  cloneFromZone = Cfg.CloneZone
-    '  prefixLabels = qnlc - 2
-    'End If
-
+    If qnlc < 2 Then Return Nothing
     Dim zlc = RegDoms.GetZoneLabelCount(request.QName)
-    If zlc < 0 Then cloneFromZone = Nothing : Exit Sub
-
-    cloneFromZone = Cfg.CloneZone
-    prefixLabels = qnlc - zlc
-    forceAA = False
-  End Sub
+    If zlc < 0 Then Return Nothing
+    Return New ICloneAnswerPlugIn.Result With {.CloneFromZone = Cfg.CloneZone, .PrefixLabels = qnlc - zlc, .ForceAA = False}
+  End Function
 
 End Class

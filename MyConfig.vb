@@ -1,6 +1,6 @@
 ﻿Class MyConfig
 
-  Friend CloneZone As JHSoftware.SimpleDNS.Plugin.DomainName
+  Friend CloneZone As JHSoftware.SimpleDNS.DomName
   'Friend TLD3 As SortedDictionary(Of JHSoftware.SimpleDNS.Plugin.DomainName, Object)
   Friend PSLFile As String
 
@@ -38,10 +38,10 @@
     Dim rv As New MyConfig
     Select Case sa(0)
       Case "1"
-        rv.CloneZone = JHSoftware.SimpleDNS.Plugin.DomainName.Parse(sa(1))
+        rv.CloneZone = DomName.Parse(sa(1))
         rv.PSLFile = ""
       Case "2"
-        rv.CloneZone = JHSoftware.SimpleDNS.Plugin.DomainName.Parse(sa(1))
+        rv.CloneZone = DomName.Parse(sa(1))
         rv.PSLFile = sa(2)
       Case Else
         Throw New Exception("Uknown config data version")
