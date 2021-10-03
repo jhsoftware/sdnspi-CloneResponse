@@ -32,7 +32,7 @@ Public Class CloneResponsePlugIn
     Dim rv As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo
     rv.Name = "Clone Response"
     rv.Description = "Clones as response from data for another domain"
-    rv.InfoURL = "http://www.simpledns.com/kb.aspx?kbid=1289"
+    rv.InfoURL = "https://simpledns.plus/kb/168/clone-response-plug-in"
     Return rv
   End Function
 
