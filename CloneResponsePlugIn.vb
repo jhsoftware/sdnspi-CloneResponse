@@ -6,11 +6,8 @@ Public Class CloneResponsePlugIn
   Private Cfg As MyConfig
   Private RegDoms As RegisterableDomains
 
-#Region "events"
-  Public Event AsyncError(ByVal ex As System.Exception) Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.AsyncError
-  Public Event LogLine(ByVal text As String) Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.LogLine
-  Public Event SaveConfig(ByVal config As String) Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.SaveConfig
-#End Region
+  Public Property Host As IHost Implements IPlugInBase.Host
+
 #Region "not implemented"
   Public Function InstanceConflict(ByVal config1 As String, ByVal config2 As String, ByRef errorMsg As String) As Boolean Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.InstanceConflict
     Return False
@@ -26,6 +23,9 @@ Public Class CloneResponsePlugIn
   Public Sub StopService() Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.StopService
   End Sub
 
+  Public Function Signal(code As Integer, data As Object) As Task(Of Object) Implements IPlugInBase.Signal
+    Return Task.FromResult(Of Object)(Nothing)
+  End Function
 #End Region
 
   Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetPlugInTypeInfo
@@ -44,10 +44,11 @@ Public Class CloneResponsePlugIn
     Return New OptionsUI
   End Function
 
-  Public Sub StartService() Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.StartService
+  Private Function StartService() As Task Implements IPlugInBase.StartService
     RegDoms = New RegisterableDomains
     RegDoms.Load(Cfg.PSLFile)
-  End Sub
+    Return Task.CompletedTask
+  End Function
 
   Public Function Lookup(request As IDNSRequest) As Task(Of ICloneAnswerPlugIn.Result) Implements ICloneAnswerPlugIn.Lookup
     Return Task.FromResult(Lookup2(request))
