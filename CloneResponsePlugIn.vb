@@ -1,7 +1,8 @@
 ﻿Imports System.Threading.Tasks
 
 Public Class CloneResponsePlugIn
-  Implements JHSoftware.SimpleDNS.Plugin.ICloneAnswerPlugIn
+  Implements JHSoftware.SimpleDNS.Plugin.ICloneAnswer
+  Implements IOptionsUI
 
   Private Cfg As MyConfig
   Private RegDoms As RegisterableDomains
@@ -23,9 +24,6 @@ Public Class CloneResponsePlugIn
   Public Sub StopService() Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.StopService
   End Sub
 
-  Public Function Signal(code As Integer, data As Object) As Task(Of Object) Implements IPlugInBase.Signal
-    Return Task.FromResult(Of Object)(Nothing)
-  End Function
 #End Region
 
   Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetPlugInTypeInfo
@@ -40,7 +38,7 @@ Public Class CloneResponsePlugIn
     Cfg = MyConfig.Load(config)
   End Sub
 
-  Public Function GetOptionsUI(ByVal instanceID As System.Guid, ByVal dataPath As String) As JHSoftware.SimpleDNS.Plugin.OptionsUI Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetOptionsUI
+  Public Function GetOptionsUI(ByVal instanceID As System.Guid, ByVal dataPath As String) As JHSoftware.SimpleDNS.Plugin.OptionsUI Implements JHSoftware.SimpleDNS.Plugin.IOptionsUI.GetOptionsUI
     Return New OptionsUI
   End Function
 
@@ -50,16 +48,16 @@ Public Class CloneResponsePlugIn
     Return Task.CompletedTask
   End Function
 
-  Public Function Lookup(request As IDNSRequest) As Task(Of ICloneAnswerPlugIn.Result) Implements ICloneAnswerPlugIn.Lookup
+  Public Function LookupCloneAnswer(request As IDNSRequest) As Task(Of ICloneAnswer.Result) Implements ICloneAnswer.LookupCloneAnswer
     Return Task.FromResult(Lookup2(request))
   End Function
 
-  Private Function Lookup2(request As IDNSRequest) As ICloneAnswerPlugIn.Result
+  Private Function Lookup2(request As IDNSRequest) As ICloneAnswer.Result
     Dim qnlc = request.QName.SegmentCount
     If qnlc < 2 Then Return Nothing
     Dim zlc = RegDoms.GetZoneLabelCount(request.QName)
     If zlc < 0 Then Return Nothing
-    Return New ICloneAnswerPlugIn.Result With {.CloneFromZone = Cfg.CloneZone, .PrefixLabels = qnlc - zlc, .ForceAA = False}
+    Return New ICloneAnswer.Result With {.CloneFromZone = Cfg.CloneZone, .PrefixLabels = qnlc - zlc, .ForceAA = False}
   End Function
 
 End Class
