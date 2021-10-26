@@ -26,11 +26,11 @@ Public Class CloneResponsePlugIn
 
 #End Region
 
-  Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetPlugInTypeInfo
+  Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetTypeInfo
     Dim rv As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo
     rv.Name = "Clone Response"
     rv.Description = "Clones as response from data for another domain"
-    rv.InfoURL = "https://simpledns.plus/kb/168/clone-response-plug-in"
+    rv.InfoURL = "https://simpledns.plus/plugin-cloneresponse"
     Return rv
   End Function
 
@@ -48,11 +48,11 @@ Public Class CloneResponsePlugIn
     Return Task.CompletedTask
   End Function
 
-  Public Function LookupCloneAnswer(request As IDNSRequest) As Task(Of ICloneAnswer.Result) Implements ICloneAnswer.LookupCloneAnswer
+  Public Function LookupCloneAnswer(request As IRequestContext) As Task(Of ICloneAnswer.Result) Implements ICloneAnswer.LookupCloneAnswer
     Return Task.FromResult(Lookup2(request))
   End Function
 
-  Private Function Lookup2(request As IDNSRequest) As ICloneAnswer.Result
+  Private Function Lookup2(request As IRequestContext) As ICloneAnswer.Result
     Dim qnlc = request.QName.SegmentCount
     If qnlc < 2 Then Return Nothing
     Dim zlc = RegDoms.GetZoneLabelCount(request.QName)
